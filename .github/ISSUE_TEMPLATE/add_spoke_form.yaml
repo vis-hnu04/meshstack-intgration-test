@@ -1,0 +1,68 @@
+name: Add Spoke Form
+description: Adding a new spoke to one of the hubs
+title: "[Spoke Name]: "
+labels: [ "add spoke" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hello,
+        
+        this template will create a new spoke, fill out the required information given below, we will
+        automatically generate a pull request for you.
+      
+        Thanks!
+      
+  - type: dropdown
+    id: Hub_Name
+    attributes:
+      label: "Hub Name"
+      description: The name of the hub, the spoke will be connected to.
+      options:
+        - hub_weu
+        - hub_neu
+        - hub_weu_stg
+        - hub_eastus
+    validations:
+      required: true
+
+
+  - type: input
+    id: Name
+    attributes:
+      label: "Spoke Name"
+      description: Name of the spoke. No whitespaces, only alphanumeric and _,-. Needs to be globally unique.
+      placeholder: hau_ops_private_aks
+    validations:
+      required: true
+
+  - type: input
+    id: Subscription
+    attributes:
+      label: "Subscription ID"
+      description: UUID of the Azure subscription where this spoke will be placed.
+      placeholder: 00000000-1111-2222-3333-444444444444
+    validations:
+      required: true
+
+  - type: dropdown
+    id: Size
+    attributes:
+      label: "Size"
+      description: Size of the VNET
+      options:
+        - 16
+        - 32
+        - 64
+        - 128
+        - 256
+        - 512
+
+  - type: input
+    id: description
+    attributes:
+      label: "Description"
+      description: Please provide a short description for the spoke and explain its purpose
+      placeholder: Private kubernetes cluster for new project
+    validations:
+      required: true
