@@ -19,24 +19,19 @@ jobs:
           echo "$BUILDING_BLOCK_RUN" | base64 --decode > run.json
           cat run.json
 
-      - name: Extract Inputs
-        id: extract
-        run: |
-          WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json)
-          echo $WORKSPACE_NAME
-          TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json)
-          WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
-          VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
-          VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
-          echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
-
-      - name: Create TFE Workspace
+      - name: Extract Inputs and create workspace
         env:
           TFE_ORG: ${{ secrets.TFE_ORG }}
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
           VCS_Github_APP_ID: ${{ secrets.TFE_Github_App_ID }}
         run: |
-          echo " Creating workspace '${{ steps.extract.outputs.workspace_name }}'..."
+          WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json)
+          TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json)
+          WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
+          VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
+          VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
+
+           echo " Creating workspace '${{ steps.extract.outputs.workspace_name }}'..."
 
           curl -s --request POST \
             --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
@@ -46,13 +41,13 @@ jobs:
              {
               "data": {
                 "attributes": {
-                  "name": "${{ steps.extract.outputs.workspace_name }}",
-                  "terraform_version": "${{ steps.extract.outputs.terraform_version }}",
-                  "working-directory": "${{ steps.extract.outputs.working_directory }}",
+                  "name": "${WORKSPACE_NAME}",
+                  "terraform_version": "${TF_VERSION}",
+                  "working-directory": "${WORKING_DIR}",
                   "vcs-repo": {
-                    "identifier": "${{ steps.extract.outputs.vcs_identifier }}",
+                    "identifier": "${VCS_IDENTIFIER}",
                     "github-app-installation-id": "${VCS_Github_APP_ID}",
-                    "branch": "${{ steps.extract.outputs.vcs_branch }}",
+                    "branch": "${VCS_BRANCH}",
                     "tags-regex": null
                   }
                 },
