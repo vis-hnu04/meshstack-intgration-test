@@ -9,7 +9,7 @@ on:
 
 jobs:
   create-workspace:
-    runs-on: ubuntu-latest
+    runs-on: visa
 
     steps:
       - name: Set up Environment
