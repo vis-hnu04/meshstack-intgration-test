@@ -23,6 +23,7 @@ jobs:
         id: extract
         run: |
           WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json)
+          echo $WORKSPACE_NAME
           TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json)
           WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
           VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
