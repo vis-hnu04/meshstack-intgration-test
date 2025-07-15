@@ -58,19 +58,19 @@ jobs:
         ISSUE_TITLE="[${SPOKE_NAME}]: Add new spoke"
 
         ISSUE_BODY=$(cat <<EOF
-Hello,
+        Hello,
 
-this template will create a new spoke, fill out the required information given below, we will
-automatically generate a pull request for you.
-
-Thanks!
-
-**Hub Name:** ${HUB_NAME}  
-**Spoke Name:** ${SPOKE_NAME}  
-**Subscription ID:** ${SUBSCRIPTION_ID}  
-**Size:** ${SIZE}  
-**Description:** ${SPOKE_DESCRIPTION}
-EOF
+        this template will create a new spoke, fill out the required information given below, we will
+        automatically generate a pull request for you.
+        
+        Thanks!
+        
+        **Hub Name:** ${HUB_NAME}  
+        **Spoke Name:** ${SPOKE_NAME}  
+        **Subscription ID:** ${SUBSCRIPTION_ID}  
+        **Size:** ${SIZE}  
+        **Description:** ${SPOKE_DESCRIPTION}
+        EOF
         )
 
         curl -s -X POST https://api.github.com/repos/${REPO}/issues \
