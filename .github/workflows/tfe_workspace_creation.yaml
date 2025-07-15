@@ -23,31 +23,31 @@ jobs:
         env:
           TFE_ORG: ${{ secrets.TFE_ORG }}
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
-          VCS_Github_APP_ID: ${{ secrets.TFE_Github_App_ID }}
+          VCS_Github_APP_ID: ${{ secrets.TFE_Github_APP_ID }}
         run: |
-          WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json)
-          TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json)
-          WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
-          VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
-          VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
-
-           echo " Creating workspace '$WORKSPACE_NAME'..."
-
+          WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json | tr -d '\n\r' | xargs)
+          TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json | tr -d '\n\r' | xargs)
+          WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json | tr -d '\n\r' | xargs)
+          VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json | tr -d '\n\r' | xargs)
+          VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json | tr -d '\n\r' | xargs)
+      
+          echo "Creating workspace '${WORKSPACE_NAME}'..."
+      
           cat <<EOF | curl -s --request POST \
-              --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
-              --header "Authorization: Bearer ${TFE_TOKEN}" \
-              --header "Content-Type: application/vnd.api+json" \
-              --data @-
+            --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
+            --header "Authorization: Bearer ${TFE_TOKEN}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --data @-
             {
               "data": {
                 "attributes": {
-                  "name": "${WORKSPACE_NAME}",
-                  "terraform_version": "${TF_VERSION}",
-                  "working-directory": "${WORKING_DIR}",
+                  "name": ${WORKSPACE_NAME},
+                  "terraform_version": ${TF_VERSION},
+                  "working-directory": ${WORKING_DIR},
                   "vcs-repo": {
-                    "identifier": "${VCS_IDENTIFIER}",
+                    "identifier": ${VCS_IDENTIFIER},
                     "github-app-installation-id": "${VCS_Github_APP_ID}",
-                    "branch": "${VCS_BRANCH}",
+                    "branch": ${VCS_BRANCH},
                     "tags-regex": null
                   }
                 },
@@ -55,5 +55,5 @@ jobs:
               }
             }
             EOF
-
-          echo "Workspace '$WORKSPACE_NAME' created."
+      
+          echo "Workspace '${WORKSPACE_NAME}' created."
