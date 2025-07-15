@@ -1,0 +1,68 @@
+name: Create Spoke Issue
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildingBlockRun:
+        description: "meshStack Building Block Run (Base64 encoded)"
+        required: true
+
+jobs:
+  create-workspace:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Environment
+        env:
+          BUILDING_BLOCK_RUN: ${{ github.event.inputs.buildingBlockRun }}
+        run: |
+          echo "$BUILDING_BLOCK_RUN" | base64 --decode > run.json
+          cat run.json
+
+      - name: Extract Inputs
+        id: extract
+        run: |
+          export WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json)
+          export TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json)
+          export WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
+          export VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
+          export VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
+
+          echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
+          echo "terraform_version=$TF_VERSION" >> $GITHUB_OUTPUT
+          echo "working_directory=$WORKING_DIR" >> $GITHUB_OUTPUT
+          echo "vcs_identifier=$VCS_IDENTIFIER" >> $GITHUB_OUTPUT
+          echo "vcs_branch=$VCS_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Create TFE Workspace
+        env:
+          TFE_ORG: ${{ secrets.TFE_ORG }}
+          TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
+          VCS_Github_APP_ID: ${{ secrets.TFE_Github_App_ID }}
+        run: |
+          echo " Creating workspace '${{ steps.extract.outputs.workspace_name }}'..."
+
+          curl -s --request POST \
+            --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
+            --header "Authorization: Bearer ${TFE_TOKEN}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --data @- <<EOF
+             {
+              "data": {
+                "attributes": {
+                  "name": "${{ steps.extract.outputs.workspace_name }}",
+                  "terraform_version": "${{ steps.extract.outputs.terraform_version }}",
+                  "working-directory": "${{ steps.extract.outputs.working_directory }}",
+                  "vcs-repo": {
+                    "identifier": "${{ steps.extract.outputs.vcs_identifier }}",
+                    "github-app-installation-id": "${VCS_Github_APP_ID}",
+                    "branch": "${{ steps.extract.outputs.vcs_branch }}",
+                    "tags-regex": null
+                  }
+                },
+                "type": "workspaces"
+              }
+            }
+            EOF
+
+          echo "✅ Workspace '${{ steps.extract.outputs.workspace_name }}' created."
