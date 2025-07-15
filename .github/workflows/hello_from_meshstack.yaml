@@ -9,7 +9,7 @@ on:
 
 jobs:
   say-hello:
-    runs-on: cloud-docker-s
+    runs-on: visa
     steps:
       - name: Say Hello
         run: echo "👋 Hello from meshStack!"
