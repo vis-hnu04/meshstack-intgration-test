@@ -4,35 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       buildingBlockRun:
-        description: "meshStack Building Block Run"
+        description: "meshStack Building Block Run (Base64 encoded)"
         required: true
-  
-      spoke_name:
-        description: "Spoke Name (e.g., hau_ops_private_aks)"
-        required: true
-        type: string
-
-      subscription_id:
-        description: "Azure Subscription ID (UUID format)"
-        required: true
-        type: string
-
-      size:
-        description: "VNET Size"
-        required: true
-        type: choice
-        options:
-          - 16
-          - 32
-          - 64
-          - 128
-          - 256
-          - 512
-
-      description:
-        description: "Short description of the spoke"
-        required: true
-        type: string
 
 jobs:
   create-issue:
@@ -43,18 +16,25 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         REPO: ${{ github.repository }}
-        HUB_NAME: ${{ github.event.inputs.hub_name }}
-        SPOKE_NAME: ${{ github.event.inputs.spoke_name }}
-        SUBSCRIPTION_ID: ${{ github.event.inputs.subscription_id }}
-        SIZE: ${{ github.event.inputs.size }}
-        SPOKE_DESCRIPTION: ${{ github.event.inputs.description }}
+        BUILDING_BLOCK_RUN: ${{ github.event.inputs.buildingBlockRun }}
+      
       run: |
+        # Decode base64 input
+        echo "$BUILDING_BLOCK_RUN" | base64 --decode > run.json
+
+        # Extract variables using jq
+        HUB_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="hub_name") | .value' run.json)
+        SPOKE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="spoke_name") | .value' run.json)
+        SUBSCRIPTION_ID=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="subscription_id") | .value' run.json)
+        SIZE=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="size") | .value' run.json)
+        SPOKE_DESCRIPTION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="description") | .value' run.json)
+
         ISSUE_TITLE="[${SPOKE_NAME}]: Add new spoke"
 
         ISSUE_BODY=$(cat <<EOF
         Hello,
-
-        this template will create a new spoke, fill out the required information given below, we will
+        
+        this template will create a new spoke. Fill out the required information below; we will
         automatically generate a pull request for you.
         
         Thanks!
@@ -65,7 +45,7 @@ jobs:
         **Size:** ${SIZE}  
         **Description:** ${SPOKE_DESCRIPTION}
         EOF
-        )
+                )
 
         curl -s -X POST https://api.github.com/repos/${REPO}/issues \
           -H "Authorization: Bearer ${GITHUB_TOKEN}" \
