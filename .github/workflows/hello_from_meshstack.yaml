@@ -11,5 +11,8 @@ jobs:
   say-hello:
     runs-on: visa
     steps:
+      - name: Print Input
+        run:  echo "Building Block Run Input: ${{ github.event.inputs.buildingBlockRun }}"
+
       - name: Say Hello
         run: echo "👋 Hello from meshStack!"
