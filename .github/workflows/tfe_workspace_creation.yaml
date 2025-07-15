@@ -24,6 +24,7 @@ jobs:
           TFE_ORG: ${{ secrets.TFE_ORG }}
           TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
           VCS_Github_APP_ID: ${{ secrets.TFE_Github_APP_ID }}
+          OAUTH_TOKEN_ID: ${{ secrets.OAUTH_TOKEN_ID }}
         run: |
           WORKSPACE_NAME=$(jq -r 'first(.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value)' run.json | tr -d '\n\r' | xargs)
           echo "workspace name is $WORKSPACE_NAME"
@@ -36,27 +37,27 @@ jobs:
       
           echo "Creating workspace '${WORKSPACE_NAME}'..."
       
-          cat <<EOF | curl -s --request POST \
+          curl --request POST \
             --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
             --header "Authorization: Bearer ${TFE_TOKEN}" \
             --header "Content-Type: application/vnd.api+json" \
-            --data @-
-            {
+            --data '{
               "data": {
                 "attributes": {
-                  "name": ${WORKSPACE_NAME},
-                  "terraform_version": ${TF_VERSION},
-                  "working-directory": ${WORKING_DIR},
+                  "name": "'"${WORKSPACE_NAME}"'",
+                  "description": "Workspace created via GitHub Action",
+                  "terraform-version": "'"${TF_VERSION}"'",
+                  "working-directory": "'"${WORKING_DIR}"'",
                   "vcs-repo": {
-                    "identifier": ${VCS_IDENTIFIER},
-                    "github-app-installation-id": "${VCS_Github_APP_ID}",
-                    "branch": ${VCS_BRANCH},
-                    "tags-regex": null
-                  }
+                    "identifier": "'"${VCS_IDENTIFIER}"'",
+                    "branch": "'"${VCS_BRANCH}"'",
+                    "oauth-token-id": "'"${OAUTH_TOKEN_ID}"'"
+                  },
+                  "execution-mode": "remote",
+                  "auto-apply": true
                 },
                 "type": "workspaces"
               }
-            }
-            EOF
-      
+            }'
+
           echo "Workspace '${WORKSPACE_NAME}' created."
