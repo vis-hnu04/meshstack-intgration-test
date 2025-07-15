@@ -28,7 +28,9 @@ jobs:
           WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json | tr -d '\n\r' | xargs)
           echo "workspace name is $WORKSPACE_NAME"
           TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json | tr -d '\n\r' | xargs)
+          echo "TF version is $TF_VERSION"
           WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json | tr -d '\n\r' | xargs)
+          echo "workspace dir is $WORKING_DIR"
           VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json | tr -d '\n\r' | xargs)
           VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json | tr -d '\n\r' | xargs)
       
