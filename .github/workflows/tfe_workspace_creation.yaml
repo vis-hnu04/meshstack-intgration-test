@@ -31,14 +31,14 @@ jobs:
           VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
           VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
 
-           echo " Creating workspace '${{ steps.extract.outputs.workspace_name }}'..."
+           echo " Creating workspace '$WORKSPACE_NAME'..."
 
-          curl -s --request POST \
-            --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
-            --header "Authorization: Bearer ${TFE_TOKEN}" \
-            --header "Content-Type: application/vnd.api+json" \
-            --data @- <<EOF
-             {
+          cat <<EOF | curl -s --request POST \
+              --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
+              --header "Authorization: Bearer ${TFE_TOKEN}" \
+              --header "Content-Type: application/vnd.api+json" \
+              --data @-
+            {
               "data": {
                 "attributes": {
                   "name": "${WORKSPACE_NAME}",
@@ -56,4 +56,4 @@ jobs:
             }
             EOF
 
-          echo "Workspace '${{ steps.extract.outputs.workspace_name }}' created."
+          echo "Workspace '$WORKSPACE_NAME' created."
