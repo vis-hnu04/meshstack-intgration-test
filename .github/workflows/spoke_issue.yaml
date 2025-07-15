@@ -9,7 +9,7 @@ on:
       hub_name:
         description: "Hub Name (e.g., hub_weu, hub_neu)"
         required: true
-        type: choice
+        type: string
         options:
           - hub_weu
           - hub_neu
