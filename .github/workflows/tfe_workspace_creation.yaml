@@ -27,6 +27,7 @@ jobs:
           WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json)
           VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json)
           VCS_BRANCH=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value' run.json)
+          echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
 
       - name: Create TFE Workspace
         env:
