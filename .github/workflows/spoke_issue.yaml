@@ -47,7 +47,7 @@ jobs:
     steps:
     - name: Create Spoke Issue
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
         REPO: ${{ github.repository }}
         HUB_NAME: ${{ github.event.inputs.hub_name }}
         SPOKE_NAME: ${{ github.event.inputs.spoke_name }}
