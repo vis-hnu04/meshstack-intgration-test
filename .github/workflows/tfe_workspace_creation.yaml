@@ -26,6 +26,7 @@ jobs:
           VCS_Github_APP_ID: ${{ secrets.TFE_Github_APP_ID }}
         run: |
           WORKSPACE_NAME=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="workspace_name") | .value' run.json | tr -d '\n\r' | xargs)
+          echo "workspace name is $WORKSPACE_NAME"
           TF_VERSION=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="terraform_version") | .value' run.json | tr -d '\n\r' | xargs)
           WORKING_DIR=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="working_directory") | .value' run.json | tr -d '\n\r' | xargs)
           VCS_IDENTIFIER=$(jq -r '.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value' run.json | tr -d '\n\r' | xargs)
