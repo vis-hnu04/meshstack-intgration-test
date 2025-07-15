@@ -6,13 +6,13 @@ on:
       buildingBlockRun:
         description: "meshStack Building Block Run"
         required: true
-
+     
 jobs:
   say-hello:
     runs-on: visa
-    steps:
-      - name: Print Input
-        run:  echo "Building Block Run Input: ${{ github.event.inputs.buildingBlockRun }}"
 
+    steps:
       - name: Say Hello
-        run: echo "👋 Hello from meshStack!"
+        run: |
+          echo "👋 Hello from meshStack!"
+          echo "🏗️ Building Block Run: ${{ inputs.buildingBlockRun }}"
