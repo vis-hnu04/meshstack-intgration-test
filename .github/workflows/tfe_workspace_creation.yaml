@@ -35,7 +35,7 @@ jobs:
           VCS_IDENTIFIER=$(jq -r 'first(.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_identifier") | .value)' run.json | tr -d '\n\r' | xargs)
           VCS_BRANCH=$(jq -r 'first(.spec.buildingBlock.spec.inputs[] | select(.key=="vcs_branch") | .value)' run.json | tr -d '\n\r' | xargs)
       
-          echo "Creating workspace '${WORKSPACE_NAME}'..."
+          echo "Creating workspace ${WORKSPACE_NAME}..."
       
           curl --request POST \
             --url "https://app.terraform.io/api/v2/organizations/${TFE_ORG}/workspaces" \
@@ -44,14 +44,14 @@ jobs:
             --data '{
               "data": {
                 "attributes": {
-                  "name": "'"${WORKSPACE_NAME}"'",
+                  "name": "${WORKSPACE_NAME}",
                   "description": "Workspace created via GitHub Action",
-                  "terraform-version": "'"${TF_VERSION}"'",
-                  "working-directory": "'"${WORKING_DIR}"'",
+                  "terraform-version": "${TF_VERSION}",
+                  "working-directory": "${WORKING_DIR}",
                   "vcs-repo": {
-                    "identifier": "'"${VCS_IDENTIFIER}"'",
-                    "branch": "'"${VCS_BRANCH}"'",
-                    "oauth-token-id": "'"${OAUTH_TOKEN_ID}"'"
+                    "identifier": "${VCS_IDENTIFIER}",
+                    "branch": "${VCS_BRANCH}",
+                    "oauth-token-id": "${OAUTH_TOKEN_ID}"
                   },
                   "execution-mode": "remote",
                   "auto-apply": true
@@ -60,4 +60,4 @@ jobs:
               }
             }'
 
-          echo "Workspace '${WORKSPACE_NAME}' created."
+          echo "Workspace ${WORKSPACE_NAME} created."
