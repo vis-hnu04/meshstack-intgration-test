@@ -10,11 +10,6 @@ on:
         description: "Hub Name (e.g., hub_weu, hub_neu)"
         required: true
         type: string
-        options:
-          - hub_weu
-          - hub_neu
-          - hub_weu_stg
-          - hub_eastus
 
       spoke_name:
         description: "Spoke Name (e.g., hau_ops_private_aks)"
