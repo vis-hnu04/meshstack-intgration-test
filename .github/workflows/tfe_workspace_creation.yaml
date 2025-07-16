@@ -9,7 +9,7 @@ on:
 
 jobs:
   create-workspace:
-    runs-on: visa
+    runs-on: vishnu
 
     steps:
       - name: Set up Environment
